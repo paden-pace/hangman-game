@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hangman</title>
+
+    <!-- JQuery Link -->
+	 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+    <!-- Bootstrap Link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Local CSS Link -->
+    <link rel="stylesheet" type="text/css" href="assets/style.css">
+
+  <style type="text/css">
+
+      .answer-letter{
+        display: inline;
+      }
+
+      #answer-letter2{
+      }
+
+      #letters-already-guessed{
+        display: inline;
+      }
+
+      #guessed-letters{
+        display: inline;
+      }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="jumbotron">
+
+      <h2 class="text-center">Let's play Hangman!</h2>
+
+      <div class="text-center">
+        <!-- Here we have our button for generating random numbers (#random-button) -->
+        <button id="random-button" class="btn btn-primary btn-lg">Start!</button>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-lg-4">
+        <h3>These are the letters you have guessed.</h3>
+        <div id="letters-already-guessed"></div>
+      </div>
+
+      <div class="col-lg-4">
+        <h3>The selected word is:</h3>
+        <div id="selected-word"></div>
+        <div id="answer-word"></div>
+      </div>
+
+      <div class="col-lg-4">
+        <h3>Stats:</h3>
+        <div id="correct-guesses">Correct Guesses</div>
+        <div id="incorrect-guesses">Incorrect Guesses</div>
+        <div id="total-wins">Total Wins:</div>
+        <div id="total-losses">Total Losses:</div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <script type="text/javascript">
+    var totalWins = 0;
+    var totalLosses = 0;
+
+    var wordList = [["e","x","a","m","p","l","e"],
+                    ["t","e","s","t"],
+                    ["r","a","n","d","o","m"],
+                    ["a","n","o","t","h","e","r"]
+                    ]
+
+    $(document).ready(function() {
+
+      console.log("page opened!");
+
+
+      //pressing start to begin the game
+       $("#random-button").on("click", function(){
+          console.log("clicked!");
+
+          //declaring my variables that will restart with each game.
+          var noAmount = 10;
+          var yesAmount = 0;
+          var lettersAG = [""];
+
+          //displaying the number of correct guesses in html
+          $("#correct-guesses").html("You've made " + yesAmount + " correct guesses.");
+          $("#incorrect-guesses").html("You have " + noAmount + " incorrect guesses remaining.");
+          $("#total-wins").html("Total Wins: " + totalWins);
+          $("#total-losses").html("Total Losses: " + totalLosses);
+          $("#letters-already-guessed").html("");
+
+
+          //the word to be guessed is selected using random and an array 
+          var randomNumber = (Math.floor(Math.random() * wordList.length ));
+          console.log(randomNumber);
+          var calledWord = wordList[randomNumber];
+          console.log(calledWord);
+          console.log(calledWord.length);
+
+          //displaying the guess portal for the word to be guessed
+          
+         
+          $("#selected-word").html(calledWord);
+          $("#answer-word").html("");
+
+          var answerDiv =[];
+          for (var i = 0; i < calledWord.length; i++) {
+
+
+          console.log(calledWord[i]);
+
+
+          $('<div/>', {
+                      id: "answer-letter" + [i],
+                      class: "answer-letter",
+                      text: "* ",
+                  }).appendTo("#answer-word");
+
+          };
+
+ 
+
+
+//---------------------------------------------------------------------------------------------------  
+//        creating the function that will occur when a letter is guessed  
+//---------------------------------------------------------------------------------------------------     
+
+          //creating the function that will occur when a letter is guessed   
+          document.onkeyup = function(event) {
+              var guessedLetter = event.key;
+              console.log(guessedLetter);
+              var noLetter = 0;
+              var letterCheck = 0;
+              var approvedLetter = "";
+
+                  // lettersAG.push(guessedLetter);
+                  // console.log(lettersAG);
+
+
+              for (var i = 0; i < lettersAG.length; i++) {
+                if (guessedLetter === lettersAG[i]) {
+                  alert("That leter has already been guessed.");
+                  break;
+                };
+              };
+
+              for (var i = 0; i < lettersAG.length; i++) {
+                if (guessedLetter != lettersAG[i]) {
+                  letterCheck++;
+
+                  if (letterCheck === lettersAG.length) {
+                  var approvedLetter = guessedLetter;
+
+
+                  $('<div/>', {
+                       id: "guessed-letters",
+                      text: approvedLetter + " ",
+                  }).appendTo("#letters-already-guessed");
+              
+                
+
+                //the for loop that will see if the guessed letter is in the word to be guessed 
+                    for (var i = 0; i < calledWord.length; i++) {
+                        
+                      if (approvedLetter === calledWord[i]){
+                        console.log(calledWord[i]);
+                                          lettersAG.push(approvedLetter);
+                        $("#answer-letter" + [i]).html(approvedLetter);
+                        yesAmount++;
+                        $("#correct-guesses").html("You've made " + yesAmount + " correct guesses.");
+                          if (yesAmount === calledWord.length) {
+                            totalWins++;
+                            $("#total-wins").html("Total Wins: " + totalWins);
+                            alert("Congrats you win!!!");
+                            break;
+                          };
+                      } else {
+                        noLetter++;
+                          if (noLetter === calledWord.length) {
+                            console.log("no");
+                                              lettersAG.push(approvedLetter);
+                            noAmount--;
+                            $("#incorrect-guesses").html("You have " + noAmount + " incorrect guesses remaining");
+                            if (noAmount === 0) {
+                              totalLosses++;
+                              $("#total-losses").html("Total Losses: " + totalLosses);
+                              alert("You lost... I'm not even mad, I'm just disappointed...");
+                              break;
+                            };
+                          };
+                      };
+
+
+
+                      };
+                      break;
+                    };
+
+             };
+                };
+              };
+
+
+
+      });
+
+
+    });
+
+
+
+//     $(document).ready(function() {
+
+//       // CREATE THE MISSING CODE HERE. Your code should add content to the random-number div.
+//       // ...
+
+//       var totalWins = 0;
+
+//       $("#random-button").on("click", function(){
+
+//       	var randomNum = (Math.floor(Math.random() *5 + 1));
+//       	$("#random-number").html(randomNum);
+//       	var randomGuess = randomNum.toString();
+//       	console.log("randomGuess = " + randomGuess);
+
+//       	var guessAmount = 0;
+      
+
+//       document.onkeyup = function(event) {
+//         	var userNum = event.key;
+//         	var userGuess = userNum.toString();
+//         	console.log("userGuess = " + userGuess);
+
+//         	if ((userGuess === "1") || (userGuess === "2") || (userGuess === "3") || (userGuess === "4") || (userGuess === "5")) {
+
+//         		guessAmount++;
+//         		$("#guess").html("You've guessed " + guessAmount + " times...");
+
+//         		if (userGuess === randomGuess) {
+//         			alert("Congrats you guessed it!");
+//         			totalWins++;
+//         			$("#wins").html("Number of Wins: " + totalWins);
+//         			$("#random-button").html("Try Again?");
+        			
+//         		} else {
+//         			alert("Sorry you didn't guess it.");
+//         		};
+
+//         	} else {
+//         		alert("That's not a number 1-5.");
+//         	}
+
+//       };
+
+//    });
+
+
+</script>
+</body>
+</html>
